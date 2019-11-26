@@ -19,20 +19,25 @@ def test_page():
 
 @app.route('/registration', methods=["GET", "POST"])
 def registration_page():
-    return render_template("registration.html")
+    error = ''
+    if request.method == "POST":
+        login = request.form['login']
+        password = request.form['password']
+        db.create_user(login, password)
+        return redirect(url_for('login_page'))
+    return render_template("registration.html", error=error)
 
 
 @app.route('/login', methods=["GET", "POST"])
 def login_page():
     error = ''
     if request.method == "POST":
-        print(request.form)
         login = request.form['login']
         password = request.form['password']
         user = db.get_user(login, password)
         if user:
             session['user'] = user
-            return redirect(url_for('testpage'))
+            return redirect(url_for('test_page'))
         else:
             error += 'User not found'
     return render_template("login.html", error=error)

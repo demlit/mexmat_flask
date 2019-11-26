@@ -5,14 +5,15 @@
     <title>Регистрация</title>
 </head>
 <body>
-
+<form action="" method="post">
     <label for="login">
-        Введите логин: <input type="text" id="login"><br><br>
+        Введите логин: <input type="text" id="login" name="login"><br><br>
     </label>
     <label for="password">
-        Введите пароль: <input type="text" id="password"><br><br>
+        Введите пароль: <input type="text" id="password" name="password"><br><br>
     </label>
     <input type="submit" value="Отправить">
-
+</form>
+{{ error }}
 </body>
 </html>

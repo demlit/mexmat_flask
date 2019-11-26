@@ -24,6 +24,9 @@ class DB(object):
             return None
 
     def create_user(self, login, password):
+        user = self.get_user(login, password)
+        if user:
+            return 'Error: user already exist!'
         self.cursor.execute("INSERT INTO users(login,password) VALUES ('%s', '%s')" % (login, password))
         self.connection.commit()
         return self.get_user(login, password)
