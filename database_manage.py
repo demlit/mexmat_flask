@@ -15,21 +15,16 @@ class DB(object):
         self.connection.row_factory = dict_factory
         self.cursor = self.connection.cursor()
 
-    def get_user(self, login, password):
-        user = self.cursor.execute("SELECT * FROM users WHERE login = '%s' AND password = '%s'"
-                                   % (login, password)).fetchone()
-        if user:
-            return user
-        else:
-            return None
+    def get_user_by_login(self, login):
+        user = self.cursor.execute("SELECT * FROM users WHERE login = '%s'" % login).fetchone()
+        return user
 
     def create_user(self, login, password):
-        user = self.get_user(login, password)
+        user = self.get_user_by_login(login)
         if user:
-            return 'Error: user already exist!'
+            return 'User already exist'
         self.cursor.execute("INSERT INTO users(login,password) VALUES ('%s', '%s')" % (login, password))
         self.connection.commit()
-        return self.get_user(login, password)
 
     def get_question(self):
         pass
