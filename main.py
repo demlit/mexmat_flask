@@ -1,4 +1,4 @@
-from flask import render_template, request, session, url_for, redirect
+from flask import render_template, request, session, url_for, redirect, escape
 from flask import Flask
 import database_manage
 
@@ -14,7 +14,22 @@ def results_page():
 
 @app.route('/testpage', methods=["GET", "POST"])
 def test_page():
-    return render_template("testpage.html")
+    status = ''
+
+    if request.method == "POST":
+        print(request.form)
+    try:
+        question_number = escape(session['q'])
+    except KeyError:
+        question_number = 0
+    try:
+        question = db.get_next_question(question_number)
+    except IndexError:
+        return redirect(url_for('results_page'))
+    answers = db.get_answers(question['id'])
+    print(answers)
+    session['q'] = question['id']
+    return render_template("testpage.html", question=question, answers=answers, status=status)
 
 
 @app.route('/registration', methods=["GET", "POST"])
