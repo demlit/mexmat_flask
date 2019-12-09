@@ -34,10 +34,25 @@ class DB(object):
         question = self.cursor.execute("SELECT * FROM questions where id > %s order by id limit 1" % q_id).fetchall()
         return question[0]
 
-    def get_answers(self, q_id):
+    def get_answer_for_question(self, q_id):
         answers = self.cursor.execute("SELECT * FROM answers where question_id=%s" % q_id).fetchall()
         return answers
 
-    def get_answer_type(self, q_id):
-        answer_types = self.cursor.execute("SELECT * FROM answer_types where id=%s" % q_id).fetchall()
-        return answer_types
+    def get_answer_type_for_question(self, q_id):
+        answer_type = self.cursor.execute("SELECT * FROM answer_types where id=%s" % q_id).fetchall()
+        return answer_type
+
+    def get_answer_by_data(self, q_id, answer, is_right):
+        answer = self.cursor.execute("SELECT * FROM answers where question_id=%s AND answer='%s' AND is_right='%s'" %
+                                     (q_id, answer, is_right)).fetchall()
+        return answer
+
+    def set_answer(self, q_id, answer, is_right):
+        self.cursor.execute("INSERT INTO answers(question_id, answer, is_right) VALUES (%s, '%s', '%s')" %
+                            (q_id, answer, is_right))
+        return self.get_answer_by_data(q_id, answer, is_right)
+
+    def set_test_result(self, user_id, date, score):
+        self.cursor.execute("INSERT INTO test_results(user_id, date, score) VALUES (%s, '%s', '%s')" %
+                            (user_id, date, score))
+        self.connection.commit()
