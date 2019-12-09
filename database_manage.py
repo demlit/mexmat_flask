@@ -37,3 +37,7 @@ class DB(object):
     def get_answers(self, q_id):
         answers = self.cursor.execute("SELECT * FROM answers where question_id=%s" % q_id).fetchall()
         return answers
+
+    def get_answer_type(self, q_id):
+        answer_types = self.cursor.execute("SELECT * FROM answer_types where id=%s" % q_id).fetchall()
+        return answer_types

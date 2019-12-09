@@ -9,15 +9,28 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route('/results', methods=["GET", "POST"])
 def results_page():
-    return render_template("results.html")
+    status = ''
+    questions = db.get_questions()
+    true_answers = []
+    user_answers = []
+    for question in questions:
+        question_answers = db.get_answers(question['id'])
+        for question_answer in question_answers:
+            if question_answer['is_right'] == 'TRUE':
+                true_answers.append(question_answer)
+            if (str(question_answer['question_id']) in session) and (str(question_answer['id']) ==
+                                                                     session[str(question_answer['question_id'])][0]):
+                user_answers.append(question_answer)
+    return render_template("results.html", questions=questions, true_answers=true_answers, user_answers=user_answers,
+                           status=status)
 
 
 @app.route('/testpage', methods=["GET", "POST"])
 def test_page():
     status = ''
-
     if request.method == "POST":
-        print(request.form)
+        for answer in request.form:
+            session[answer] = request.form.getlist(answer)
     try:
         question_number = escape(session['q'])
     except KeyError:
@@ -27,9 +40,9 @@ def test_page():
     except IndexError:
         return redirect(url_for('results_page'))
     answers = db.get_answers(question['id'])
-    print(answers)
+    answer_type = db.get_answer_type(question['id'])
     session['q'] = question['id']
-    return render_template("testpage.html", question=question, answers=answers, status=status)
+    return render_template("testpage.html", question=question, answer_type=answer_type, answers=answers, status=status)
 
 
 @app.route('/registration', methods=["GET", "POST"])
@@ -61,6 +74,7 @@ def login_page():
                 status += 'Wrong password'
         else:
             status += 'User not found'
+    session.clear()
     return render_template("login.html", status=status)
 
 
