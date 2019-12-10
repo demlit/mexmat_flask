@@ -7,14 +7,14 @@
 <body>
     <p>{{ question['question'] }}</p>
     <form action="" method="post">
-        {% if question['type'] == 'text' %}
+        {% if question['type_id'] == 3 %}
             <label for="{{ answers[0]['id'] }}">
-            <input type="{{ question['type'] }}" id="{{ answers[0]['id'] }}" name="{{ question['id'] }}"><br>
+            <input type="{{ answer_type[0]['type'] }}" id="{{ answers[0]['id'] }}" name="{{ question['id'] }}"><br>
             </label>
         {% else %}
             {% for answer in answers %}
             <label for="{{ answer['id'] }}">
-            <input type="{{ question['type'] }}" name="{{ question['id'] }}" id="{{ answer['id'] }}" value="{{ answer['id'] }}">{{ answer['answer'] }}<br>
+            <input type="{{ answer_type[0]['type'] }}" name="{{ question['id'] }}" id="{{ answer['id'] }}" value="{{ answer['id'] }}">{{ answer['answer'] }}<br>
             </label>
             {% endfor %}
         {% endif %}

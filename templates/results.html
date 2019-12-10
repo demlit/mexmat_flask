@@ -5,6 +5,22 @@
     <title>Результаты</title>
 </head>
 <body>
-Результаты тестирования
+<p>Результаты тестирования:</p>
+    {% for question in questions %}
+        <p>{{ question['question'] }}</p>
+        <p>Ваш ответ:</p>
+            {% for user_answer in user_answers %}
+                {% if user_answer['question_id'] == question['id'] %}
+                    <p>{{ user_answer['answer'] }}</p><br>
+                {% endif %}
+            {% endfor %}
+        <p>Правильный ответ:</p>
+            {% for true_answer in true_answers %}
+                {% if true_answer['question_id'] == question['id'] %}
+                    <p>{{ true_answer['answer'] }}</p><br>
+                {% endif %}
+            {% endfor %}
+    {% endfor %}
+<p>Итого: {{ score }}% правильных ответов</p>
 </body>
 </html>
