@@ -10,6 +10,8 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route('/results', methods=["GET", "POST"])
 def results_page():
+    if 'user' not in session:
+        return redirect(url_for('main_page'))
     status = ''
     questions = db.get_questions()
     true_answers = []
@@ -48,6 +50,8 @@ def results_page():
 
 @app.route('/testpage', methods=["GET", "POST"])
 def test_page():  # TODO проверить проблему с перезаписыванием вложенного словаря
+    if 'user' not in session:
+        return redirect(url_for('main_page'))
     status = ''
     if 'test' not in session:
         session['test'] = {}
@@ -76,6 +80,8 @@ def test_page():  # TODO проверить проблему с перезапи
 
 @app.route('/registration', methods=["GET", "POST"])
 def registration_page():
+    if 'user' in session:
+        return redirect(url_for('user_page'))
     status = ''
     if request.method == "POST":
         login = request.form['login']
@@ -92,6 +98,8 @@ def registration_page():
 
 @app.route('/login', methods=["GET", "POST"])
 def login_page():
+    if 'user' in session:
+        return redirect(url_for('user_page'))
     status = ''
     if request.method == "POST":
         login = request.form['login']
@@ -105,12 +113,13 @@ def login_page():
                 status += 'Wrong password'
         else:
             status += 'User not found'
-    session.clear()
     return render_template("login.html", status=status)
 
 
 @app.route('/userpage', methods=["GET", "POST"])
 def user_page():
+    if 'user' not in session:
+        return redirect(url_for('main_page'))
     session.pop('test', None)
     if session['user']['firstname'] and session['user']['lastname']:
         firstname = session['user']['firstname']
@@ -124,6 +133,12 @@ def user_page():
 
 @app.route('/', methods=["GET", "POST"])
 def main_page():
+    print(session)
+    if 'user' in session:
+        if 'exit' not in request.form:
+            return redirect(url_for('user_page'))
+        else:
+            session.clear()
     return render_template("main.html")
 
 
