@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель пользователя</title>
+</head>
+<body>
+<h1>Панель пользователя</h1>
+{% if fullname %}
+    <p>Привествуем, {{ fullname }}!</p>
+{% else %}
+    <p>Привествуем!</p>
+{% endif %}
+<form action="testpage">
+    <input type="submit" value="Пройти тестирование">
+</form>
+<form action="/">
+    <input type="submit" value="Выход">
+</form>
+{% if test_results %}
+<p>Пройденые тесты:</p>
+<table border="1">
+    <tr>
+        <td>Дата прохождения</td>
+        <td>Баллы</td>
+    </tr>
+    {% for test_result in test_results %}
+    <tr>
+        <td>
+            {{ test_result['date'] }}
+        </td>
+        <td>
+            {{ test_result['score'] }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+</body>
+</html>
