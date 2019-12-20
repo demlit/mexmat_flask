@@ -23,7 +23,7 @@ class DB(object):
         user = self.get_user_by_login(login)
         if user:
             return 'User already exist'
-        self.cursor.execute("INSERT INTO users(login,password, first_name, last_name) VALUES ('%s', '%s', '%s', '%s')" %
+        self.cursor.execute("INSERT INTO users(login,password, firstname, lastname) VALUES ('%s', '%s', '%s', '%s')" %
                             (login, password, firstname, lastname))
         self.connection.commit()
 

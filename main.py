@@ -1,4 +1,4 @@
-from flask import render_template, request, session, url_for, redirect, escape
+from flask import render_template, request, session, url_for, redirect
 from flask import Flask
 import database_manage
 from datetime import datetime
@@ -19,8 +19,8 @@ def results_page():
         for question_answer in question_answers:
             if question_answer['is_right'] == 'TRUE':
                 true_answers.append(question_answer)
-            if str(question_answer['question_id']) in session:
-                for user_answer in session[str(question_answer['question_id'])]:
+            if str(question_answer['question_id']) in session['test']:
+                for user_answer in session['test'][str(question_answer['question_id'])]:
                     if str(question_answer['id']) == user_answer:
                         user_answers.append(question_answer)
                     elif db.get_answer_type_for_question(question['type_id'])[0]['type'] == 'text':
@@ -36,29 +36,41 @@ def results_page():
     for answer in user_answers:
         if answer['is_right'] == 'TRUE':
             count_user_answers += 1
-    score = round(count_user_answers/count_true_answers * 100)
-    db.set_test_result(session['user']['id'], datetime.now(), score)
+    score = round(count_user_answers / count_true_answers * 100)
+    if 'score' not in session['test']:
+        db.set_test_result(session['user']['id'], datetime.now(), score)
+        test_dict = session['test']
+        test_dict['score'] = score
+        session['test'] = test_dict
     return render_template("results.html", questions=questions, true_answers=true_answers, user_answers=user_answers,
                            score=score, status=status)
 
 
 @app.route('/testpage', methods=["GET", "POST"])
-def test_page():
+def test_page():  # TODO проверить проблему с перезаписыванием вложенного словаря
     status = ''
+    if 'test' not in session:
+        session['test'] = {}
+    test_dict = session['test']
     if request.method == "POST":
         for answer in request.form:
-            session[answer] = request.form.getlist(answer)
+            if answer != 'submit':
+                test_dict[answer] = request.form.getlist(answer)
     try:
-        question_number = escape(session['q'])
+        question_number = test_dict['q']
     except KeyError:
         question_number = 0
-    try:
-        question = db.get_next_question(question_number)
-    except IndexError:
-        return redirect(url_for('results_page'))
+    session['test'] = test_dict
+    if 'submit' + str(question_number) in request.form:
+        try:
+            question = db.get_next_question(question_number)
+        except IndexError:
+            return redirect(url_for('results_page'))
+    else:
+        question = db.get_next_question(question_number - 1)
     answers = db.get_answer_for_question(question['id'])
     answer_type = db.get_answer_type_for_question(question['id'])
-    session['q'] = question['id']
+    test_dict['q'] = question['id']
     return render_template("testpage.html", question=question, answer_type=answer_type, answers=answers, status=status)
 
 
@@ -99,7 +111,8 @@ def login_page():
 
 @app.route('/userpage', methods=["GET", "POST"])
 def user_page():
-    if 'firstname' and 'lastname' in session['user']:
+    session.pop('test', None)
+    if session['user']['firstname'] and session['user']['lastname']:
         firstname = session['user']['firstname']
         lastname = session['user']['lastname']
         fullname = firstname + " " + lastname
