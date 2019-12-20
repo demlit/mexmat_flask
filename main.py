@@ -48,7 +48,6 @@ def results_page():
 
 @app.route('/testpage', methods=["GET", "POST"])
 def test_page():  # TODO проверить проблему с перезаписыванием вложенного словаря
-    print(request.form)
     status = ''
     if 'test' not in session:
         session['test'] = {}
