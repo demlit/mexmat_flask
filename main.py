@@ -133,7 +133,6 @@ def user_page():
 
 @app.route('/', methods=["GET", "POST"])
 def main_page():
-    print(session)
     if 'user' in session:
         if 'exit' not in request.form:
             return redirect(url_for('user_page'))
