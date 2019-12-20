@@ -19,11 +19,12 @@ class DB(object):
         user = self.cursor.execute("SELECT * FROM users WHERE login = '%s'" % login).fetchone()
         return user
 
-    def create_user(self, login, password):
+    def create_user(self, login, password, firstname, lastname):
         user = self.get_user_by_login(login)
         if user:
             return 'User already exist'
-        self.cursor.execute("INSERT INTO users(login,password) VALUES ('%s', '%s')" % (login, password))
+        self.cursor.execute("INSERT INTO users(login,password, first_name, last_name) VALUES ('%s', '%s', '%s', '%s')" %
+                            (login, password, firstname, lastname))
         self.connection.commit()
 
     def get_questions(self):
@@ -56,3 +57,7 @@ class DB(object):
         self.cursor.execute("INSERT INTO test_results(user_id, date, score) VALUES (%s, '%s', '%s')" %
                             (user_id, date, score))
         self.connection.commit()
+
+    def get_test_results(self, user_id):
+        test_result = self.cursor.execute("SELECT * FROM test_results where user_id=%s" % user_id).fetchall()
+        return test_result

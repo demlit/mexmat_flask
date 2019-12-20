@@ -68,7 +68,9 @@ def registration_page():
     if request.method == "POST":
         login = request.form['login']
         password = request.form['password']
-        added = db.create_user(login, password)
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
+        added = db.create_user(login, password, firstname, lastname)
         if added:
             status += added
         else:
@@ -86,13 +88,25 @@ def login_page():
         if user:
             if user['password'] == password:
                 session['user'] = user
-                return redirect(url_for('test_page'))
+                return redirect(url_for('user_page'))
             else:
                 status += 'Wrong password'
         else:
             status += 'User not found'
     session.clear()
     return render_template("login.html", status=status)
+
+
+@app.route('/userpage', methods=["GET", "POST"])
+def user_page():
+    if 'firstname' and 'lastname' in session['user']:
+        firstname = session['user']['firstname']
+        lastname = session['user']['lastname']
+        fullname = firstname + " " + lastname
+    else:
+        fullname = session['user']['login']
+    test_results = db.get_test_results(session['user']['id'])
+    return render_template("user.html", fullname=fullname, test_results=test_results)
 
 
 @app.route('/', methods=["GET", "POST"])
